@@ -9,13 +9,14 @@ export default function ShortenUrl() {
   const [error, setError] = useState("");
 
   const { mutate: shortenUrl, isLoading } = useMutation(
-    (longUrl) => api.post("/api/urls/shorten", { longUrl }),
+    (longUrl) => api.post("/urls/shorten", { longUrl }),
     {
       onSuccess: (res) => {
         setShortUrl(res.data.shortUrl);
         setError("");
       },
       onError: (err) => {
+        console.log("Error while shortnening: ", err);
         setError(err.response?.data?.message || "Failed to shorten URL");
       },
     }

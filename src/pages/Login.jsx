@@ -15,15 +15,21 @@ export default function Login() {
 
     try {
       // Make a POST request to the login endpoint
-      const response = await api.post("api/auth/login", { email, password });
+      const response = await api.post("/auth/login", { email, password });
 
       // Save the token in localStorage
-      localStorage.setItem("token", response.data.token);
-
+      const response_data = response.data;
+      console.log(">>>>> Response data: ", response_data);
+      localStorage.setItem("access_token", response_data.data.tokens.access);
+      localStorage.setItem("refresh_token", response_data.data.tokens.refresh);
+      	
+      console.log("redirecting to dashboard");
+      // window.href = "/dashboard";
       // Redirect to the dashboard
       navigate("/dashboard");
     } catch (err) {
       // Handle errors
+      console.log("Error while logging in: ", err);
       setError(err.response?.data?.message || "Login failed");
     }
   };

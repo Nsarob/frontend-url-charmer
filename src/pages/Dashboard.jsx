@@ -1,11 +1,22 @@
 // src/pages/Dashboard.jsx
-import { useState } from "react"; // Add this import
+import { useState, useEffect } from "react"; // Add this import
 import { useQuery, useMutation } from "@tanstack/react-query";
 import api from "../api";
 
 export default function Dashboard() {
   const [url, setUrl] = useState(""); // Now useState is defined
   const [error, setError] = useState("");
+  // const [accessToken, setAccessToken] = useState(""); // Add this line
+
+  const accessToken = localStorage.getItem("access_token");
+
+  // useEffect(() => {
+  //   // Fetch access token from local storage
+  //   const token = localStorage.getItem("access_token");
+  //   if (token) {
+  //     setAccessToken(token);
+  //   }
+  // }, []);
 
   // Fetch user-specific URLs
   const {
@@ -14,17 +25,18 @@ export default function Dashboard() {
     refetch,
   } = useQuery({
     queryKey: ["urls"],
-    queryFn: () => api.get("/api/urls").then((res) => res.data),
+    queryFn: () => api.get("/urls").then((res) => res.data),
   });
 
   // Shorten URL mutation
   const { mutate: shortenUrl, isLoading: isShortening } = useMutation({
-    mutationFn: (longUrl) => api.post("/api/urls/shorten", { longUrl }),
+    mutationFn: (longUrl) => api.post("/urls/shorten", { longUrl }),
     onSuccess: () => {
       setUrl("");
       refetch();
     },
     onError: (err) => {
+      console.log("Error while shortnening: ", err);
       setError(err.response?.data?.message || "Failed to shorten URL");
     },
   });
@@ -33,6 +45,8 @@ export default function Dashboard() {
     e.preventDefault();
     shortenUrl(url);
   };
+
+  console.log("URLS: ", urls);
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -61,15 +75,15 @@ export default function Dashboard() {
           <p>Loading...</p>
         ) : (
           <ul>
-            {urls?.map((url) => (
-              <li key={url.short_code} className="mb-2">
+            {urls?.data?.map((url) => (
+              <li key={url.id} className="mb-2">
                 <a
-                  href={`/${url.short_code}`}
+                  href={`${url.shortUrl}?accessToken=${accessToken}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline"
                 >
-                  {url.short_code}
+                  {url.shortUrl}
                 </a>
               </li>
             ))}
