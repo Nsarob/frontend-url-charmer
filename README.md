@@ -1,11 +1,3 @@
-# frontend-url-charmer
-React frontend of a scalable url shortner website
-
-
-# Getting Started with Create React App
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
 # Url-charmer
 Url-charmer - v1
 React frontend of a scalable url shortner website.
