@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { ArrowRight, Link, AlertCircle } from 'lucide-react';
+import api from '../api';
 
-const LoginPage = () => {
+const SignupPage = () => {
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setconfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
@@ -11,19 +14,23 @@ const LoginPage = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      setLoading(false);
+      return;
+    }
+
     try {
-      // This would be an actual API call in production
-      // const response = await axios.post('/api/auth/login', { email, password });
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Simulate successful login
-      localStorage.setItem('authToken', 'sample-token-12345');
-      window.location.href = '/dashboard';
+      const response = await api.post('auth/register', { username, email, password });
+
+      if (response.status !== 201) {
+        throw new Error('Signup failed');
+      }
+
+      window.location.href = '/login';
     } catch (err) {
-      setError('Invalid email or password. Please try again.');
+      setError('Signup failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -44,8 +51,8 @@ const LoginPage = () => {
         <div className="w-full max-w-md">
           <div className="bg-white rounded-lg shadow-lg p-8">
             <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
-              <p className="text-gray-600 mt-2">Sign in to your ShortLink account</p>
+              <h1 className="text-2xl font-bold text-gray-900">Welcome</h1>
+              <p className="text-gray-600 mt-2">Create your ShortLink account</p>
             </div>
             
             {error && (
@@ -58,12 +65,26 @@ const LoginPage = () => {
             <form onSubmit={handleSubmit}>
               <div className="space-y-6">
                 <div>
+                  <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                    Username
+                  </label>
+                  <input
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="username"
+                    required
+                  />
+                </div>
+                <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                     Email address
                   </label>
                   <input
                     id="email"
-                    type="email"
+                    type="text"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -77,9 +98,6 @@ const LoginPage = () => {
                     <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                       Password
                     </label>
-                    <a href="/forgot-password" className="text-sm text-indigo-600 hover:text-indigo-500">
-                      Forgot password?
-                    </a>
                   </div>
                   <input
                     id="password"
@@ -91,19 +109,23 @@ const LoginPage = () => {
                     required
                   />
                 </div>
-                
-                <div className="flex items-center">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label htmlFor="confirm_password" className="block text-sm font-medium text-gray-700">
+                      Confirm Password
+                    </label>
+                  </div>
                   <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                    id="confirm_password"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setconfirmPassword(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="••••••••"
+                    required
                   />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                    Remember me
-                  </label>
                 </div>
-                
+        
                 <button
                   type="submit"
                   className="w-full bg-indigo-600 text-white px-4 py-3 rounded-md hover:bg-indigo-700 transition flex items-center justify-center"
@@ -115,11 +137,11 @@ const LoginPage = () => {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Signing in...
+                      Sign up...
                     </span>
                   ) : (
                     <span className="flex items-center">
-                      Sign in <ArrowRight className="ml-2" size={18} />
+                      Sign up <ArrowRight className="ml-2" size={18} />
                     </span>
                   )}
                 </button>
@@ -128,9 +150,9 @@ const LoginPage = () => {
             
             <div className="mt-8 text-center">
               <p className="text-sm text-gray-600">
-                Don't have an account?{' '}
-                <a href="/signup" className="text-indigo-600 hover:text-indigo-500 font-medium">
-                  Sign up
+                You have an account?{' '}
+                <a href="/login" className="text-indigo-600 hover:text-indigo-500 font-medium">
+                  Sign in
                 </a>
               </p>
             </div>
@@ -150,4 +172,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default SignupPage;
