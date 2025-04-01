@@ -40,6 +40,6 @@ The front-end server will start on http://localhost:5173.
    ```sh
    node server.js 
 
-The back-end server will start on http://localhost:5173
+The back-end server will start on http://localhost:5000
 
 
